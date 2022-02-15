@@ -41,20 +41,20 @@ void ros_convertions::toROS( <%= ros_ref_type(ros_type) %> ros, <%= type.arg_typ
 {
 <%= result = ""
 	type.to_ros(typekit, result, " " * 4)
-	result 
+	result
 	%>
 }
 void ros_convertions::fromROS( <%= type.ref_type %> value, <%= ros_arg_type(ros_type) %> ros )
 {
 <%= result = ""
 	type.from_ros(typekit, result, " " * 4)
-	result 
+	result
 	%>
 }
 <% end %>
 
 <% convert_array_types.each do |type, ros_type| %>
-<%   next if type <= Typelib::NumericType  %>
+<%   next if type.cxx_fundamental_type? %>
 void ros_convertions::toROS( std::vector< <%= ros_cxx_type(ros_type) %> >& ros, <%= type.cxx_name%> const* value, int length )
 {
     ros.resize(length);

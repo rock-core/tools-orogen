@@ -22,6 +22,7 @@ module OroGen
                     @typekit = typekit
 
                     Typelib::Type.extend(TypekitMarshallers::TypeInfo::Type)
+                    Typelib::CharacterType.extend(TypekitMarshallers::TypeInfo::CharacterType)
                     Typelib::NumericType.extend(TypekitMarshallers::TypeInfo::NumericType)
                     Typelib::ContainerType.extend(TypekitMarshallers::TypeInfo::ContainerType)
                     Typelib::EnumType.extend(TypekitMarshallers::TypeInfo::EnumType)
@@ -92,6 +93,20 @@ module OroGen
 
                 def info_type
                     raise NotImplementedError, "don't know what to use to handle #{self}"
+                end
+            end
+
+            module CharacterType
+                def boost_serialization_compatible?
+                    true
+                end
+
+                def info_type_header
+                    "rtt/types/TemplateTypeInfo.hpp"
+                end
+
+                def info_type
+                    "RTT::types::TemplateTypeInfo"
                 end
             end
 

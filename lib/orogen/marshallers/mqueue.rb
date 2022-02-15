@@ -8,6 +8,7 @@ module OroGen
                 def initialize(typekit)
                     @typekit = typekit
                     Typelib::Type.extend(TypekitMarshallers::MQueue::Type)
+                    Typelib::CharacterType.extend(TypekitMarshallers::MQueue::CharacterType)
                     Typelib::NumericType.extend(TypekitMarshallers::MQueue::NumericType)
                     Typelib::ContainerType.extend(TypekitMarshallers::MQueue::ContainerType)
                     Typelib::EnumType.extend(TypekitMarshallers::MQueue::EnumType)
@@ -104,6 +105,12 @@ module OroGen
             module Type
                 def mqueue_compatible?
                     false
+                end
+            end
+
+            module CharacterType
+                def mqueue_compatible?
+                    true
                 end
             end
 

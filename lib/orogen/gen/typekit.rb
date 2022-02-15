@@ -144,15 +144,33 @@ module Typelib
         def self.code_assign(result, indent, dest, src)
             result << "#{indent}#{dest} = #{src};\n"
         end
+
+        def self.cxx_fundamental_type?
+            false
+        end
     end
 
     class NumericType
+        def self.cxx_fundamental_type?
+            true
+        end
+
         def self.contains_int64?
             integer? && size == 8
         end
 
         def self.inlines_code?
             superclass.eql?(NumericType)
+        end
+    end
+
+    class CharacterType
+        def self.cxx_fundamental_type?
+            true
+        end
+
+        def self.inlines_code?
+            true
         end
     end
 
@@ -748,7 +766,12 @@ module OroGen
                 attr_reader :pending_loads
 
                 def using_typekit(typekit)
-                    imported_types.merge(typekit.registry)
+                    begin
+                        imported_types.merge(typekit.registry)
+                    rescue StandardError => e
+                        raise "when loading #{typekit.name}: #{e.message}"
+                    end
+
                     self.imported_typelist |= typekit.typelist
                     self.include_dirs      |= typekit.include_dirs.to_set
                     opaques.concat(typekit.opaques)
@@ -1382,10 +1405,8 @@ module OroGen
                         container_includes + deference_includes
                     elsif type <= Typelib::NullType
                         []
-                    elsif type <= Typelib::NumericType
-                        if type.integer? then [":boost/cstdint.hpp"]
-                        else []
-                        end
+                    elsif type.cxx_fundamental_type?
+                        []
                     elsif (existing = existing_orogen_include_for_type(type))
                         existing
                     else
@@ -2132,7 +2153,7 @@ module OroGen
                     # unnecessarily (the original sets are hashes, and therefore don't
                     # have a stable order).
                     converted_types = generated_types
-                                      .find_all { |type| !(type <= Typelib::NumericType) }
+                                      .find_all { |type| !type.cxx_fundamental_type? }
                                       .sort_by(&:name)
 
                     # We need a special case for arrays. The issue is the following:
@@ -2166,7 +2187,7 @@ module OroGen
                     registered_types =
                         if type_export_policy == :all
                             generated_types.find_all do |type|
-                                !m_type?(type) && !(type <= Typelib::NumericType)
+                                !m_type?(type) && !type.cxx_fundamental_type?
                             end.to_set
 
                         elsif type_export_policy == :used

@@ -9,6 +9,7 @@ module OroGen
                     @typekit = typekit
 
                     Typelib::Type.extend(TypekitMarshallers::Corba::Type)
+                    Typelib::CharacterType.extend(TypekitMarshallers::Corba::CharacterType)
                     Typelib::NumericType.extend(TypekitMarshallers::Corba::NumericType)
                     Typelib::ContainerType.extend(TypekitMarshallers::Corba::ContainerType)
                     Typelib::EnumType.extend(TypekitMarshallers::Corba::EnumType)
@@ -211,17 +212,23 @@ module OroGen
                 end
             end
 
+            module CharacterType
+                def corba_name
+                    unless size == 1
+                        raise "unexpected character size #{size}"
+                    end
+
+                    "CORBA::Char"
+                end
+            end
+
             module NumericType
                 def corba_name
                     if integer?
                         if name == "/bool"
                             "CORBA::Boolean"
                         elsif size == 1
-                            if unsigned?
-                                "CORBA::Octet"
-                            else
-                                "CORBA::Char"
-                            end
+                            "CORBA::Octet"
                         elsif size == 2
                             "CORBA::#{'U' if unsigned?}Short"
                         elsif size == 4

@@ -197,7 +197,7 @@ module OroGen
 
                 # Returns true if +type+ is a base type in ROS
                 def ros_base_type?(type)
-                    type < Typelib::NumericType || type < Typelib::EnumType
+                    type.cxx_fundamental_type? || type < Typelib::EnumType
                 end
 
                 # Returns the type name that should be used in a field in
@@ -281,6 +281,8 @@ module OroGen
                             "double"
                         else raise ArgumentError, "don't know what to use to represent #{type} on the ROS C++ mapping"
                         end
+                    elsif type < Typelib::CharacterType
+                        "char"
                     elsif type < Typelib::EnumType
                         "boost::int32_t"
                     elsif msg_name == "time"
@@ -613,7 +615,7 @@ module OroGen
                 # The method must return the string that will be used for
                 # convertion
                 def to_ros(typekit, buffer, indent)
-                    if deference.kind_of?(Typelib::NumericType)
+                    if deference.cxx_fundamental_type?
                         buffer << "#{indent}ros = value;"
                     else
                         buffer <<
@@ -630,7 +632,7 @@ module OroGen
                 # The method must return the string that will be used for
                 # convertion
                 def from_ros(typekit, buffer, indent)
-                    if deference.kind_of?(Typelib::NumericType)
+                    if deference.cxx_fundamental_type?
                         buffer << "#{indent}value = ros;"
                     else
                         buffer <<

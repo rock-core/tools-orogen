@@ -23,7 +23,7 @@ needed_convertions = (typesets.converted_types | typesets.array_types).
         result << type << intermediate_type
         result | type.direct_dependencies.to_set | intermediate_type.direct_dependencies.to_set
     end
-needed_convertions.delete_if { |t| t <= Typelib::NumericType }
+needed_convertions.delete_if { |t| t.cxx_fundamental_type? }
 # Plain types might depend on array types, split the two
 needed_array_convertions, needed_convertions = needed_convertions.
     partition { |t| t <= Typelib::ArrayType }
@@ -63,7 +63,7 @@ namespace orogen_typekits {
 {
 <%= result = ""
 	type.to_corba(typekit, result, " " * 4)
-	result 
+	result
 	%>
     return true;
 }
@@ -72,7 +72,7 @@ namespace orogen_typekits {
 {
 <%= result = ""
 	type.from_corba(typekit, result, " " * 4)
-	result 
+	result
 	%>
     return true;
 }
@@ -83,7 +83,7 @@ namespace orogen_typekits {
 {
 <%= result = ""
 	type.to_corba(typekit, result, " " * 4)
-	result 
+	result
 	%>
     return true;
 }
@@ -91,7 +91,7 @@ namespace orogen_typekits {
 {
 <%= result = ""
 	type.from_corba(typekit, result, " " * 4)
-	result 
+	result
 	%>
     return true;
 }

@@ -133,7 +133,7 @@ module Typelib
         def self.base_rtt_type?(type)
             if type.name == "/std/string"
                 return true
-            elsif !(type <= Typelib::NumericType)
+            elsif !type.cxx_fundamental_type?
                 return false
             end
 
@@ -161,7 +161,7 @@ module Typelib
 
             if type.name == "/std/string"
                 return "string"
-            elsif !(type <= Typelib::NumericType)
+            elsif !type.cxx_fundamental_type?
                 return type.name
             end
 
