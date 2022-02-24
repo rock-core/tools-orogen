@@ -91,7 +91,11 @@ module Typelib
         end
 
         def self.cxx_name
-            normalize_cxxname(name)
+            if (name = metadata.get("cxxname"))
+                name.first
+            else
+                normalize_cxxname(name)
+            end
         end
 
         def self.cxx_basename
