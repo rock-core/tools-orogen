@@ -144,17 +144,9 @@ module Typelib
         def self.code_assign(result, indent, dest, src)
             result << "#{indent}#{dest} = #{src};\n"
         end
-
-        def self.cxx_fundamental_type?
-            false
-        end
     end
 
     class NumericType
-        def self.cxx_fundamental_type?
-            true
-        end
-
         def self.contains_int64?
             integer? && size == 8
         end
@@ -165,10 +157,6 @@ module Typelib
     end
 
     class CharacterType
-        def self.cxx_fundamental_type?
-            true
-        end
-
         def self.inlines_code?
             true
         end
@@ -1405,7 +1393,13 @@ module OroGen
                         container_includes + deference_includes
                     elsif type <= Typelib::NullType
                         []
-                    elsif type.cxx_fundamental_type?
+                    elsif type <= Typelib::NumericType
+                        if type.integer?
+                            [":boost/cstdint.hpp"]
+                        else
+                            []
+                        end
+                    elsif type.fundamental_type?
                         []
                     elsif (existing = existing_orogen_include_for_type(type))
                         existing
@@ -2153,7 +2147,7 @@ module OroGen
                     # unnecessarily (the original sets are hashes, and therefore don't
                     # have a stable order).
                     converted_types = generated_types
-                                      .find_all { |type| !type.cxx_fundamental_type? }
+                                      .find_all { |type| !type.fundamental_type? }
                                       .sort_by(&:name)
 
                     # We need a special case for arrays. The issue is the following:
@@ -2187,7 +2181,7 @@ module OroGen
                     registered_types =
                         if type_export_policy == :all
                             generated_types.find_all do |type|
-                                !m_type?(type) && !type.cxx_fundamental_type?
+                                !m_type?(type) && !type.fundamental_type?
                             end.to_set
 
                         elsif type_export_policy == :used

@@ -216,7 +216,7 @@ EOF
                     arglist = arguments.map do |name, type, doc, qualified_type|
                         # Auto-add const-ref for non-trivial types
                         arg =
-                            if type.cxx_name == qualified_type && !type.cxx_fundamental_type?
+                            if type.cxx_name == qualified_type && !type.fundamental_type?
                                 "#{type.cxx_name} const &"
                             else
                                 qualified_type

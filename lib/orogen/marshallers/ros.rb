@@ -197,7 +197,7 @@ module OroGen
 
                 # Returns true if +type+ is a base type in ROS
                 def ros_base_type?(type)
-                    type.cxx_fundamental_type? || type < Typelib::EnumType
+                    type.fundamental_type? || type < Typelib::EnumType
                 end
 
                 # Returns the type name that should be used in a field in
@@ -615,7 +615,7 @@ module OroGen
                 # The method must return the string that will be used for
                 # convertion
                 def to_ros(typekit, buffer, indent)
-                    if deference.cxx_fundamental_type?
+                    if deference.fundamental_type?
                         buffer << "#{indent}ros = value;"
                     else
                         buffer <<
@@ -632,7 +632,7 @@ module OroGen
                 # The method must return the string that will be used for
                 # convertion
                 def from_ros(typekit, buffer, indent)
-                    if deference.cxx_fundamental_type?
+                    if deference.fundamental_type?
                         buffer << "#{indent}value = ros;"
                     else
                         buffer <<

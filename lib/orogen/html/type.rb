@@ -34,7 +34,7 @@ module OroGen
             end
 
             def has_convertions?(type, recursive = true)
-                if type.cxx_fundamental_type?
+                if type.fundamental_type?
                     return false
                 elsif type.convertion_to_ruby
                     return true
@@ -123,7 +123,7 @@ module OroGen
                     "#{render_type_link(type.deference)}[#{type.length}]"
                 elsif type < Typelib::ContainerType
                     "#{type.container_kind}&lt;#{render_type_link(type.deference)}&gt;"
-                elsif type.cxx_fundamental_type?
+                elsif type.fundamental_type?
                     type.name
                 else
                     page.link_to(type)

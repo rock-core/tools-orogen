@@ -23,7 +23,7 @@ needed_convertions = (typesets.converted_types | typesets.array_types).
         result << type << intermediate_type
         result | type.direct_dependencies.to_set | intermediate_type.direct_dependencies.to_set
     end
-needed_convertions.delete_if { |t| t.cxx_fundamental_type? }
+needed_convertions.delete_if { |t| t.fundamental_type? }
 # Plain types might depend on array types, split the two
 needed_array_convertions, needed_convertions = needed_convertions.
     partition { |t| t <= Typelib::ArrayType }
