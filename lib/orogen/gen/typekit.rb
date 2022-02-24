@@ -926,7 +926,6 @@ module OroGen
                     type_export_policy :all
                     @selected_types = Set.new
                     @excluded_types = Set.new
-                    Project.using_rtt_typekit(self)
                 end
 
                 # The set of code generation plugins
@@ -1673,26 +1672,10 @@ module OroGen
                     raise NotImplementedError
                 end
 
-                BASE_TYPES = ["int", "unsigned int", "double", "float", "bool", "char"]
-                BASE_TYPES_RTT_NAMES = {
-                    "unsigned int" => "uint"
-                }
                 BASE_TYPES_NEEDED_TRANSPORTS = %w{typelib ros}
 
                 def normalize_registry
                     base = registry.dup
-
-                    # Properly define the headers we want to use for cstdint headers
-                    [1, 2, 4, 8].each do |int_size|
-                        if base.include?("/int#{int_size * 8}_t")
-                            base.get("/int#{int_size * 8}_t")
-                                .metadata.set("orogen_include", "boost/cstdint.hpp")
-                        end
-                        if base.include?("/uint#{int_size * 8}_t")
-                            base.get("/uint#{int_size * 8}_t")
-                                .metadata.set("orogen_include", "boost/cstdint.hpp")
-                        end
-                    end
 
                     result = Typelib::Registry.new
                     self_types.each do |type|
@@ -1973,6 +1956,7 @@ module OroGen
                     generated_types = []
                     registry.each do |type|
                         next if imported_type?(type.name)
+                        next if type.null?
 
                         generated_types << type
                     end
@@ -2384,9 +2368,9 @@ module OroGen
                 # @param [String] includes
                 # @return [String]
                 def cxx_gen_includes(*includes)
-                    includes.to_set.map do |inc|
+                    includes.compact.to_set.map do |inc|
                         "#include <#{inc}>"
-                    end.sort.join("\n") + "\n"
+                    end.compact.sort.join("\n") + "\n"
                 end
             end
         end

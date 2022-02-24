@@ -310,19 +310,9 @@ module OroGen
                     @registry = Typelib::Registry.new
                     @opaque_registry = Typelib::Registry.new
                     Typelib::Registry.add_standard_cxx_types(registry)
-                    Project.using_rtt_typekit(self)
 
                     @max_sizes = Hash.new { |h, k| h[k] = Hash.new }
                     @disabled_namespaces = ["test"]
-                end
-
-                def self.using_rtt_typekit(obj)
-                    OroGen::Loaders::RTT.standard_typekits.each do |tk|
-                        if tk.name == "orocos"
-                            tk.extend RTTTypekit
-                        end
-                        obj.using_typekit(tk)
-                    end
                 end
 
                 # Returns the TaskContext object for the default task contexts
