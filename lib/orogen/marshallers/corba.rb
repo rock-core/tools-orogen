@@ -188,11 +188,11 @@ module OroGen
                 end
 
                 def to_corba(typekit, result, *args)
-                    raise NotImplementedError
+                    raise NotImplementedError, "to_corba not implemented for #{name}"
                 end
 
                 def from_corba(typekit, result, *args)
-                    raise NotImplementedError
+                    raise NotImplementedError, "from_corba not implemented for #{name}"
                 end
 
                 def inline_fromCorba(result, value, indent) # rubocop:disable Naming/MethodName
@@ -212,7 +212,19 @@ module OroGen
                 end
             end
 
+            module FundamentalType
+                def to_corba(typekit, result, indent)
+                    result << "#{indent}corba = value;\n"
+                end
+
+                def from_corba(typekit, result, indent)
+                    result << "#{indent}value = corba;\n"
+                end
+            end
+
             module CharacterType
+                include FundamentalType
+
                 def corba_name
                     unless size == 1
                         raise "unexpected character size #{size}"
@@ -223,6 +235,8 @@ module OroGen
             end
 
             module NumericType
+                include FundamentalType
+
                 def corba_name
                     if integer?
                         if name == "/bool"
@@ -261,6 +275,16 @@ module OroGen
             end
 
             ::Typelib::specialize_model "/int8_t" do
+                def inline_fromAny(any_var, corba_var, indent) # rubocop:disable Naming/MethodName
+                    "#{indent}#{any_var} >>= CORBA::Any::to_octet(#{corba_var});"
+                end
+
+                def inline_toAny(any_var, corba_var, indent) # rubocop:disable Naming/MethodName
+                    "#{indent}#{any_var} <<= CORBA::Any::from_octet(#{corba_var});"
+                end
+            end
+
+            ::Typelib::specialize_model "/char8_t" do
                 def inline_fromAny(any_var, corba_var, indent) # rubocop:disable Naming/MethodName
                     "#{indent}#{any_var} >>= CORBA::Any::to_char(#{corba_var});"
                 end

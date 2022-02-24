@@ -29,20 +29,11 @@ needed_array_convertions, needed_convertions = needed_convertions.
     partition { |t| t <= Typelib::ArrayType }
 # And add the root array types to the result
 needed_array_convertions |= typesets.array_types
-
-# We cannot assume that the headers the user provide do include boost/cstdint.hpp
-# So, can't assume that all numeric types are already defined
-#
-# The only place where it matters, though, is when the int type appears in a
-# signature, e.g. when it is the element of a container
-needed_numeric_types = needed_convertions.map do |t|
-    if t.respond_to?(:deference) && t.deference <= Typelib::NumericType
-        t.deference
-    end
-end.compact
 %>
 
-<% all_includes = (needed_numeric_types.to_set | typesets.converted_types | typesets.array_types).flat_map do |type| %>
+#include <boost/cstdint.hpp>
+
+<% all_includes = (typesets.converted_types | typesets.array_types).flat_map do |type| %>
 <%     typekit.include_for_type(type) %>
 <% end %>
 <%= typekit.cxx_gen_includes(*all_includes) %>
