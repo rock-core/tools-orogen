@@ -10,7 +10,7 @@ module OroGen
                 Port.include PortGeneration
                 OutputPort.include OutputPortGeneration
                 InputPort.include InputPortGeneration
-                TaskContext.include TaskContextGeneration
+                TaskContext.prepend TaskContextGeneration
             end
         end
     end

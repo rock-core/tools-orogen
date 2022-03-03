@@ -580,6 +580,10 @@ thread_#{name}->setMaxOverrun(#{max_overruns});
                 project.xenomai?
             end
 
+            def loader
+                @project.loader
+            end
+
             def initialize(project = nil, name = nil)
                 @project = project
                 @name = name
@@ -688,29 +692,21 @@ thread_#{name}->setMaxOverrun(#{max_overruns});
             # Returns the set of typekits required by this particular
             # deployment (i.e. the tasks that are deployed in it)
             def used_typekits
-                task_typekits = task_activities.map do |deployed_task|
-                    deployed_task.task_model.used_typekits
-                                 .map(&:name)
-                end.flatten.to_set
-
-                @manually_loaded_types.each do |type|
-                    tk = project.imported_typekits_for(type).map(&:name)[0]
-                    unless tk
-                        raise InternalError, "could not find manually loaded type \"#{type}\""
-                    end
-
-                    task_typekits << tk
+                typekits = task_activities.flat_map do |deployed_task|
+                    deployed_task.task_model.used_typekits.to_a
                 end
 
-                task_typekits.sort.map do |used_name|
-                    this_tk = project.find_typekit(used_name)
-                    next if this_tk.virtual?
-                    unless this_tk
-                        raise InternalError, "#{used_name} is a typekit that is listed by one of the tasks of the #{name} deployment, but the oroGen project #{project.name} does not list it"
+                @manually_loaded_types.each do |type|
+                    tk = loader.imported_typekits_for(type).first
+                    unless tk
+                        raise InternalError,
+                              "could not find manually loaded type \"#{type}\""
                     end
 
-                    this_tk
-                end.compact
+                    typekits << tk
+                end
+
+                typekits.find_all { |t| !t.virtual? }
             end
 
             # call-seq:

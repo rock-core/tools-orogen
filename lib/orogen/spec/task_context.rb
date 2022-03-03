@@ -432,6 +432,20 @@ module OroGen
             def initialize_copy(from)
             end
 
+            # Set of typekits that define this task's interfaces
+            #
+            # Returns the set of typekits that define the types used in this
+            # task's interface. They are required at compile and link time
+            # because of the explicit instanciation of interface templates
+            # (ports, ...)
+            #
+            # @return [Set<Spec::Typekit>]
+            def used_typekits
+                each_interface_type
+                    .flat_map { |type| loader.imported_typekits_for(type.name).to_a }
+                    .uniq
+            end
+
             # Returns the task context models that are in this model's ancestry
             def ancestors
                 m = self
