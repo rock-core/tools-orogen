@@ -203,7 +203,8 @@ module OroGen
             def using_typekit(typekit)
                 if typekit.respond_to?(:to_str)
                     loader.typekit_model_from_name(typekit)
-                else loader.register_typekit_objects(typekit)
+                else
+                    loader.register_typekit_objects(typekit)
                 end
             end
 

@@ -1738,6 +1738,16 @@ module OroGen
                     typekits_required_for(registry.each)
                 end
 
+                # Manually request loading of types that are not provided throught
+                # the task_contex typekit.
+                def load_type(typename)
+                    unless project.imported_typekits_for(typename).map(&:name)[0]
+                        raise ArgumentError, "cannot find a typekit defining #{typename}"
+                    end
+
+                    @manually_loaded_types << typename
+                end
+
                 # Returns the set of pkg-config packages this typekit depends on
                 def dependencies
                     result = []

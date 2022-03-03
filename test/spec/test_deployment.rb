@@ -5,9 +5,9 @@ require "orogen/test"
 describe OroGen::Spec::Deployment do
     attr_reader :project, :task_model, :deployment
     before do
-        loader = OroGen::Loaders::Files.new
-        OroGen::Loaders::RTT.setup_loader(loader)
-        @project = OroGen::Spec::Project.new(loader)
+        @loader = OroGen::Loaders::Files.new
+        OroGen::Loaders::RTT.setup_loader(@loader)
+        @project = OroGen::Spec::Project.new(@loader)
         @project.name "test"
         @task_model = project.task_context "Test"
         @deployment = project.deployment "test"
@@ -58,6 +58,41 @@ describe OroGen::Spec::Deployment do
             task = deployment.task "test", task_model
             assert_equal("RTT::Activity", task.activity_type.class_name)
             assert_equal(0.1, task.period)
+        end
+    end
+
+    describe "#used_typekits" do
+        it "ignores the typekits needed by the project's tasks "\
+           "if it does not deploy one" do
+            tk = OroGen::Spec::Typekit.new(@loader, "test")
+            flexmock(@task_model).should_receive(:used_typekits).and_return([tk])
+            assert_equal [], @deployment.used_typekits
+        end
+
+        it "returns all the typekits its tasks need" do
+            tk = OroGen::Spec::Typekit.new(@loader, "test")
+            flexmock(@task_model).should_receive(:used_typekits).and_return([tk])
+            deployment.task("task", "Test")
+            assert_equal [tk], @deployment.used_typekits
+        end
+
+        it "adds the types registered manually" do
+            registry = Typelib::Registry.new
+            registry.create_numeric "/stub", 4, :sint
+            tk = OroGen::Spec::Typekit.new(
+                @loader, "test", registry, ["/stub"], ["/stub"]
+            )
+            @loader.register_typekit_model(tk)
+            deployment.load_type "/stub"
+            assert_equal [tk], @deployment.used_typekits
+        end
+
+        it "ignores virtual typekits" do
+            tk = OroGen::Spec::Typekit.new(@loader, "test")
+            tk.virtual = true
+            flexmock(@task_model).should_receive(:used_typekits).and_return([tk])
+            deployment.task("task", "Test")
+            assert_equal [], @deployment.used_typekits
         end
     end
 end

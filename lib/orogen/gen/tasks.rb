@@ -349,7 +349,9 @@ EOF
                     name
                 end
 
-                def initialize
+                def initialize(*, **)
+                    super
+
                     hooks = %w{configure start update error exception fatal stop cleanup}
                     @base_hook_code = Hash.new
                     hooks.each do |hook_name|
