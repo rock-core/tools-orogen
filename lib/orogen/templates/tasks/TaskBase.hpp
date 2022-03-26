@@ -108,9 +108,11 @@ namespace <%= space %>{
 
         bool start();
 
-        <% if task.extended_state_support? && !task.superclass.extended_state_support? %>
+        <% if task.extended_state_support? %>
 #ifdef RTT_HAS_STATE_CHANGE_HOOK
         void setTaskState(TaskState state);
+
+        <% unless task.superclass.extended_state_support? %>
 #else
         // Reimplement TaskCore base methods to export the states to the outside
         // world
@@ -118,6 +120,7 @@ namespace <%= space %>{
         bool recover();
         bool stop();
         bool cleanup();
+        <% end %>
 #endif
         <% end %>
 
