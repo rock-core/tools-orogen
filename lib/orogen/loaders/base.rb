@@ -514,8 +514,8 @@ module OroGen
             #   name.
             # @return [(String,String)] the model as text, as well as a path to
             #   the model file (or nil if there is no such file)
-            def project_model_text_from_name(_name)
-                raise NotImplementedError
+            def project_model_text_from_name(name)
+                raise NotImplementedError, "textual representation of project #{name} not registered on #{self}"
             end
 
             # Returns the textual representation of a typekit
