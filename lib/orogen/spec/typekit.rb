@@ -124,7 +124,7 @@ module OroGen
                 typelist.any? { |str| str =~ /#{Regexp.quote(typename)}(\[\d+\])+/ }
             end
 
-            # @deprecated use {#include} instead
+            # @deprecated use {#include?} instead
             def includes?(type)
                 include?(type)
             end
@@ -242,7 +242,7 @@ module OroGen
             # @param [Type,String] type_def the type or type name
             # @return [Type] the type of the intermediate, or 'type_def' itself
             #   if 'type_def' is not an opaque
-            # @raises Typelib::NotFound if the expected intermediate type cannot
+            # @raise Typelib::NotFound if the expected intermediate type cannot
             #   be found
             def intermediate_type_for(type_def)
                 typename = intermediate_type_name_for(type_def)
@@ -254,7 +254,7 @@ module OroGen
             # @param [#name,String] type the type or type name
             # @return [Model<Typelib::Type>] the type of the opaque, or the
             #   given type if it is not an intermediate type
-            # @raises Typelib::NotFound if the expected intermediate type cannot
+            # @raise Typelib::NotFound if the expected intermediate type cannot
             #   be found
             def opaque_type_for(type)
                 find_opaque_for_intermediate(type) || resolve_type(type)

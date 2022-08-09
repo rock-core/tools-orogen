@@ -404,7 +404,7 @@ module OroGen
             module OpaqueHandling
                 # Get the opaque definition for a given type
                 #
-                # @param [Type,String] the type or type name
+                # @param [Type,String] type_def the type or type name
                 # @return [OpaqueDefinition]
                 def opaque_specification(type_def)
                     type = find_type(type_def)
@@ -414,7 +414,10 @@ module OroGen
                     if (result = opaques.find { |opaque_def| opaque_def.type.eql? type })
                         result
                     else
-                        raise InternalError, "#{self}#opaque_specification called for type #{type.name}, but could not find the corresponding opaque specification"
+                        raise InternalError,
+                              "#{self}#opaque_specification called for type "\
+                              "#{type.name}, but could not find the corresponding "\
+                              "opaque specification"
                     end
                 end
 
@@ -487,7 +490,7 @@ module OroGen
                 # @param [Type,String] type_def the type or type name
                 # @return [Type] the type of the intermediate, or 'type_def' itself
                 #   if 'type_def' is not an opaque
-                # @raises Typelib::NotFound if the expected intermediate type cannot
+                # @raise Typelib::NotFound if the expected intermediate type cannot
                 #   be found
                 def intermediate_type_for(type_def)
                     typename = intermediate_type_name_for(type_def)
@@ -1221,7 +1224,7 @@ module OroGen
                 # orogen is able to compute the memory layout of the types (i.e.
                 # the exact offsets for all the fields in the structures).
                 #
-                # @raises LoadError if the file does not exist
+                # @raise LoadError if the file does not exist
                 def load(file, add = true, user_options = Hash.new)
                     unless user_options.respond_to?(:to_hash)
                         raise ArgumentError, "expected an option has as third argument, got #{user_options.inspect}"

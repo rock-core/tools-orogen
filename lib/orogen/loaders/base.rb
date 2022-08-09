@@ -71,7 +71,7 @@ module OroGen
 
             # Returns the project model corresponding to the given name
             #
-            # @param [String] the project name
+            # @param [String] name the project name
             # @raise [ProjectNotFound] if there is no project with that
             #   name.
             # @return [OroGen::Spec::Project]
@@ -509,7 +509,7 @@ module OroGen
 
             # Returns the textual representation of a project model
             #
-            # @param [String] the project name
+            # @param [String] name the project name
             # @raise [ProjectNotFound] if there is no project with that
             #   name.
             # @return [(String,String)] the model as text, as well as a path to
@@ -520,7 +520,7 @@ module OroGen
 
             # Returns the textual representation of a typekit
             #
-            # @param [String] the typekit name
+            # @param [String] _name the typekit name
             # @raise [TypekitNotFound] if there is no typekit with that name
             # @return [(String,String)] the typekit registry as XML and the
             #   typekit's typelist
@@ -554,7 +554,7 @@ module OroGen
 
             # Returns the task library name in which a task model is defined
             #
-            # @param [String] model_name the name of the task model to look for
+            # @param [String] name the name of the task model to look for
             # @return [String,nil]
             def find_task_library_from_task_model_name(name)
                 if (m = /^(\w+)::/.match(name))

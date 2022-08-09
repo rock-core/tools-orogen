@@ -103,7 +103,7 @@ module OroGen
                 # Enumerate the C++-specific {GlobalInitializer} objects needed by
                 # this deployment
                 #
-                # @param [GlobalInitializer] initializer
+                # @yieldparam [GlobalInitializer] initializer
                 def each_needed_global_cpp_initializer
                     return enum_for(__method__) unless block_given?
 

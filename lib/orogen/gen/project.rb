@@ -1096,7 +1096,7 @@ module OroGen
 
                 # Declares a task context that is being imported, not defined
                 #
-                # @options options [Class] type (Spec::TaskContext) the
+                # @options options [Class] class (Spec::TaskContext) the
                 #   class of the created task context
                 def external_task_context(name, **options, &block)
                     if has_task_context?(name)
