@@ -440,8 +440,8 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
 
     exiting = false;
 
-    if (vm.count("ior_write")) {
-        int ior_write = vm["ior_write"].as<int>();
+    if (vm.count("ior-write")) {
+        int ior_write = vm["ior-write"].as<int>();
         std::string ior, message;
         std::ostringstream message_ostream;
         int write_result;
