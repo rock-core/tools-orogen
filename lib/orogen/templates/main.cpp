@@ -444,7 +444,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
         int ior_write = vm["ior-write-fd"].as<int>();
         std::string ior;
         std::ostringstream message_ostream;
-        int write_result;
+        int write_result = 0;
 
     <% activity_ordered_tasks.each do |task| %>
         ior = RTT::corba::TaskContextServer::getIOR(task_<%= task.name %>.get());
@@ -452,9 +452,14 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
     <% end %>
         message_ostream << "DONE\n";
         std::string message = message_ostream.str();
-        write_result = write(ior_write, message.c_str(), message.length() + 1);
-        if (write_result < 0) {
-            std::cerr << "failed writing on ior pipe" << std::endl;
+        while (write_result < message.length() + 1) {
+            message.erase(0, write_result);
+            write_result = write(ior_write, message.c_str(), message.length() + 1);
+
+            if (write_result < 0) {
+                std::cerr << "failed to write on ior pipe" << std::endl;
+                break;
+            }
         }
         close(ior_write);
     }
