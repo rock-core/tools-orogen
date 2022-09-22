@@ -151,7 +151,6 @@ void sigint_quit_orb(int)
 }
 <% end %>
 
-
 void *oro_thread(void *p){
     while(!exiting){
         char dummy;
@@ -175,7 +174,8 @@ int ORO_main(int argc, char* argv[])
 #endif // OROGEN_SERVICE_DISOCVERY_ACTIVATED
 <% end %>
         ("with-ros", po::value<bool>()->default_value(false), "also publish the task as ROS node, default is false")
-        ("rename", po::value< std::vector<std::string> >(), "rename a task of the deployment: --rename oldname:newname");
+        ("rename", po::value< std::vector<std::string> >(), "rename a task of the deployment: --rename oldname:newname")
+        ("ior-write", po::value<int>(), "the write side of the ior pipe");
 
    po::variables_map vm;
    po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -439,6 +439,32 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
     <% end %>
 
     exiting = false;
+
+    if (vm.count("ior_write")) {
+        int ior_write = vm["ior_write"].as<int>();
+        std::string ior, message;
+        std::ostringstream message_ostream;
+        int write_result;
+
+    <% activity_ordered_tasks.each do |task| %>
+        ior = RTT::corba::TaskContextServer::getIOR(task_<%= task.name %>.get());
+        message_ostream << task_<%= task.name %>.get()->getName() << " " << ior << std::endl;
+        message = message_ostream.str();
+
+        write_result = write(ior_write, &message, sizeof(message));
+        if (write_result < 0) {
+            std::cerr << "failed writing on ior pipe" << std::endl;
+        }
+
+    <% end %>
+        std::string ior_done = "DONE\n";
+        write_result = write(ior_write, &ior_done, sizeof(ior_done));
+        if (write_result < 0) {
+            std::cerr << "failed writing on ior pipe" << std::endl;
+        }
+        close(ior_write);
+    }
+
     oro_thread(NULL);
 
     RTT::corba::TaskContextServer::ShutdownOrb();
