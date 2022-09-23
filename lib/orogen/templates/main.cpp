@@ -446,11 +446,15 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
         std::ostringstream message_ostream;
         int write_result = 0;
 
+        message_ostream << "{";
     <% activity_ordered_tasks.each do |task| %>
         ior = RTT::corba::TaskContextServer::getIOR(task_<%= task.name %>.get());
-        message_ostream << task_<%= task.name %>.get()->getName() << " " << ior << std::endl;
+        message_ostream << "\"" << task_<%= task.name %>.get()->getName() << "\": \"" << ior << "\"";
+    <% if task != activity_ordered_tasks.last %>
+        message_ostream << ",";
     <% end %>
-        message_ostream << "DONE\n";
+    <% end %>
+        message_ostream << "}";
         std::string message = message_ostream.str();
         while (write_result < message.length() + 1) {
             message.erase(0, write_result);
