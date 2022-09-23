@@ -456,9 +456,9 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
     <% end %>
         message_ostream << "}";
         std::string message = message_ostream.str();
-        while (write_result < message.length() + 1) {
+        while (write_result < message.length()) {
             message.erase(0, write_result);
-            write_result = write(ior_write, message.c_str(), message.length() + 1);
+            write_result = write(ior_write, message.c_str(), message.length());
 
             if (write_result < 0) {
                 std::cerr << "failed to write on ior pipe" << std::endl;
