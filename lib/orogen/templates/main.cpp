@@ -151,7 +151,6 @@ void sigint_quit_orb(int)
 }
 <% end %>
 
-
 void *oro_thread(void *p){
     while(!exiting){
         char dummy;
@@ -175,7 +174,8 @@ int ORO_main(int argc, char* argv[])
 #endif // OROGEN_SERVICE_DISOCVERY_ACTIVATED
 <% end %>
         ("with-ros", po::value<bool>()->default_value(false), "also publish the task as ROS node, default is false")
-        ("rename", po::value< std::vector<std::string> >(), "rename a task of the deployment: --rename oldname:newname");
+        ("rename", po::value< std::vector<std::string> >(), "rename a task of the deployment: --rename oldname:newname")
+        ("ior-write-fd", po::value<int>(), "the write file descriptor of the ior pipe");
 
    po::variables_map vm;
    po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -439,6 +439,35 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
     <% end %>
 
     exiting = false;
+
+    if (vm.count("ior-write-fd")) {
+        int ior_write = vm["ior-write-fd"].as<int>();
+        std::string ior;
+        std::ostringstream message_ostream;
+        int write_result = 0;
+
+        message_ostream << "{";
+    <% activity_ordered_tasks.each do |task| %>
+        ior = RTT::corba::TaskContextServer::getIOR(task_<%= task.name %>.get());
+        message_ostream << "\"" << task_<%= task.name %>.get()->getName() << "\": \"" << ior << "\"";
+    <% if task != activity_ordered_tasks.last %>
+        message_ostream << ",";
+    <% end %>
+    <% end %>
+        message_ostream << "}";
+        std::string message = message_ostream.str();
+        while (write_result < message.length()) {
+            message.erase(0, write_result);
+            write_result = write(ior_write, message.c_str(), message.length());
+
+            if (write_result < 0) {
+                std::cerr << "failed to write on ior pipe (fd " << ior_write << "): " <<  strerror(errno)  << std::endl;
+                break;
+            }
+        }
+        close(ior_write);
+    }
+
     oro_thread(NULL);
 
     RTT::corba::TaskContextServer::ShutdownOrb();
