@@ -14,7 +14,7 @@ require "find"
 class Module
     def enumerate_inherited_set(each_name, attribute_name = each_name) # :nodoc:
         class_eval <<-EOD, __FILE__, __LINE__
-        def find_#{attribute_name}(name) 
+        def find_#{attribute_name}(name)
             each_#{each_name} do |n|
                 return n if n.name == name
             end
@@ -94,7 +94,9 @@ module OroGen
         name = name.to_s if name.respond_to?(:to_sym)
         name = name.to_str
         if name !~ /^[a-zA-Z0-9_:][a-zA-Z0-9_:]*$/
-            raise ArgumentError, "task name '#{name}' invalid: it can contain only alphanumeric characters and '_', and cannot start with a number"
+            raise ArgumentError,
+                  "task name '#{name}' invalid: it can contain only alphanumeric "\
+                  "characters and '_', and cannot start with a number"
         end
 
         name

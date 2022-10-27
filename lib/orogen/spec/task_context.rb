@@ -1115,11 +1115,11 @@ module OroGen
             # corresponding OutputPort object.
             #
             # See also #input_port
-            def output_port(name, type, options = Hash.new)
+            def output_port(name, type, **options)
+                options = validate_options(options, class: OutputPort)
+
                 name = OroGen.verify_valid_identifier(name)
                 check_uniqueness(name)
-                options = Kernel.validate_options options,
-                                                  :class => OutputPort
 
                 @output_ports[name] = port = options[:class].new(self, name, type)
                 Spec.load_documentation(port, /output_port/)
@@ -1133,11 +1133,11 @@ module OroGen
             # corresponding InputPort object.
             #
             # See also #output_port
-            def input_port(name, type, options = Hash.new)
+            def input_port(name, type, **options)
+                options = Kernel.validate_options(options, class: InputPort)
+
                 name = OroGen.verify_valid_identifier(name)
                 check_uniqueness(name)
-                options = Kernel.validate_options options,
-                                                  :class => InputPort
 
                 @input_ports[name] = port = options[:class].new(self, name, type)
                 Spec.load_documentation(port, /input_port/)
@@ -1211,9 +1211,7 @@ module OroGen
 
             # Enumerates both the input and output ports
             def each_port(&block)
-                unless block_given?
-                    return enum_for(:each_port, &block)
-                end
+                return enum_for(:each_port) unless block_given?
 
                 each_input_port(&block)
                 each_output_port(&block)

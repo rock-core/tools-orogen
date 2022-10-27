@@ -100,11 +100,10 @@ module OroGen
             end
 
             def self.each_pkgconfig_link_dependency(context, depspec)
-                return enum_for(:each_pkgconfig_link_dependency, context, depspec) unless block_given?
+                return enum_for(__method__, context, depspec) unless block_given?
+
                 depspec.each do |s|
-                    if s.in_context?(context, "link")
-                        yield "${#{s.var_name}_LIBRARIES}"
-                    end
+                    yield "${#{s.var_name}_LIBRARIES}" if s.in_context?(context, "link")
                 end
             end
 

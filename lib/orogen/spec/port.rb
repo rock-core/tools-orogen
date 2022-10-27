@@ -112,7 +112,10 @@ module OroGen
                     type = task.project.find_interface_type(type)
                     OroGen.validate_toplevel_type(type)
                     if type.name == "/std/vector<double>"
-                        Spec.warn "#{type.name} is used as the port type for #{name}, logging it will not be possible"
+                        Spec.warn(
+                            "#{type.name} is used as the port type for #{name}, "\
+                            "logging it will not be possible"
+                        )
                     end
                 end
                 @task = task

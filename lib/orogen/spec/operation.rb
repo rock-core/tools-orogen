@@ -131,7 +131,9 @@ module OroGen
             # error
             def argument(name, qualified_type, doc = "")
                 if arguments.size >= RTT_ARGUMENT_COUNT_LIMIT
-                    raise ArgumentError, "RTT does not support having more than #{RTT_ARGUMENT_COUNT_LIMIT} arguments for an operation"
+                    raise ArgumentError,
+                          "RTT does not support having more than "\
+                          "#{RTT_ARGUMENT_COUNT_LIMIT} arguments for an operation"
                 end
 
                 type, qualified_type = find_interface_type(qualified_type)
