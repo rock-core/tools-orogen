@@ -47,13 +47,8 @@ module OroGen
             RTT_ARGUMENT_COUNT_LIMIT = 4
 
             def initialize(task, name)
-                name = name.to_s
-                if name !~ /^\w+$/
-                    raise ArgumentError, "#{self.class.name.downcase} names need to be valid C++ identifiers, i.e. contain only alphanumeric characters and _ (got #{name})"
-                end
-
                 @task = task
-                @name = name
+                @name = name.to_s
                 @return_type = [nil, "void", ""]
                 @arguments = []
                 @in_caller_thread = false

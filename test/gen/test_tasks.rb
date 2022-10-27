@@ -6,9 +6,58 @@ class TC_GenerationTasks < Minitest::Test
     attr_reader :task, :project
     def setup
         @project = OroGen::Gen::RTT_CPP::Project.new
+        @project.import_types_from "std"
         project.name "test"
         @task = project.task_context "Task"
         super
+    end
+
+    def test_it_validates_that_the_task_name_is_a_proper_cpp_identifier
+        assert_raises(ArgumentError) { project.task_context("bla bla") }
+        assert_raises(ArgumentError) { project.task_context("bla(bla") }
+        assert_raises(ArgumentError) { project.task_context("bla!bla") }
+        assert_raises(ArgumentError) { project.task_context("bla/bla") }
+        project.task_context("bla")
+    end
+
+    def test_it_validates_that_property_names_are_valid_cpp_identifiers
+        assert_raises(ArgumentError) { task.property("bla bla", "/double") }
+        assert_raises(ArgumentError) { task.property("bla(bla", "/double") }
+        assert_raises(ArgumentError) { task.property("bla!bla", "/double") }
+        assert_raises(ArgumentError) { task.property("bla/bla", "/double") }
+        task.property("bla", "/double")
+    end
+
+    def test_it_validates_that_attribute_names_are_valid_cpp_identifiers
+        assert_raises(ArgumentError) { task.attribute("bla bla", "/double") }
+        assert_raises(ArgumentError) { task.attribute("bla(bla", "/double") }
+        assert_raises(ArgumentError) { task.attribute("bla!bla", "/double") }
+        assert_raises(ArgumentError) { task.attribute("bla/bla", "/double") }
+        task.attribute("bla", "/double")
+    end
+
+    def test_it_validates_that_output_port_names_are_valid_cpp_identifiers
+        assert_raises(ArgumentError) { task.output_port("bla bla", "/double") }
+        assert_raises(ArgumentError) { task.output_port("bla(bla", "/double") }
+        assert_raises(ArgumentError) { task.output_port("bla!bla", "/double") }
+        assert_raises(ArgumentError) { task.output_port("bla/bla", "/double") }
+        task.output_port("bla", "/double")
+    end
+
+    def test_it_validates_that_input_port_names_are_valid_cpp_identifiers
+        assert_raises(ArgumentError) { task.input_port("bla bla", "/double") }
+        assert_raises(ArgumentError) { task.input_port("bla(bla", "/double") }
+        assert_raises(ArgumentError) { task.input_port("bla!bla", "/double") }
+        assert_raises(ArgumentError) { task.input_port("bla/bla", "/double") }
+        task.input_port("bla", "/double")
+    end
+
+    def test_it_validates_that_operation_names_are_valid_cpp_identifiers
+        assert_raises(ArgumentError) { task.operation("bla bla") }
+        assert_raises(ArgumentError) { task.operation("bla(bla") }
+        assert_raises(ArgumentError) { task.operation("bla!bla") }
+        assert_raises(ArgumentError) { task.operation("bla/bla") }
+        task.operation("bla")
     end
 
     # Orogen should refuse to create a task context which has the same name than
@@ -141,6 +190,7 @@ class TC_GenerationTasks < Minitest::Test
     def test_it_can_generate_tasks_with_a_default_activity
         task.default_activity :periodic, 10
         deployment = project.deployment "test"
+        project.enable_transports "corba"
         deployment.task "test", task
         create_wc("tasks/default_activity")
         compile_wc(project)

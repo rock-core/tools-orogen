@@ -167,14 +167,6 @@ module OroGen
                     return
                 end
 
-                if name == self.name
-                    raise ArgumentError, "a task cannot have the same name as the project"
-                elsif name !~ /^(\w+::)*\w+$/
-                    raise ArgumentError, "task names need to be valid C++ identifiers, i.e. contain only alphanumeric characters and _ (got #{name})"
-                end
-
-                name = OroGen.verify_valid_identifier(name)
-
                 task = external_task_context(name, subclasses: subclasses, **options, &block)
                 task.extended_state_support
                 self_tasks[task.name] = task

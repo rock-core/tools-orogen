@@ -43,16 +43,12 @@ module OroGen
 
             # Create a new property with the given name, type and default value
             def initialize(task, name, type, default_value)
-                name = name.to_s
-                if name !~ /^\w+$/
-                    raise ArgumentError, "property names need to be valid C++ identifiers, i.e. contain only alphanumeric characters and _ (got #{name})"
-                end
-
                 type = task.project.find_interface_type(type)
                 OroGen.validate_toplevel_type(type)
+
                 @dynamic = false
                 @task = task
-                @name = name
+                @name = name.to_s
                 @type = type
                 @default_value = default_value
                 @setter_operation = nil

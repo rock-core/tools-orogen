@@ -306,6 +306,43 @@ EOF
             # <tt>_time</tt> to be added to the generated class (more specifically,
             # to the +Base+ subclass).
             module TaskContextGeneration
+                def output_port(name, type, *args, **options)
+                    RTT_CPP.verify_valid_identifier(name, "output port")
+                    type = validate_interface_type(type)
+
+                    if type.name == "/std/vector<double>"
+                        Spec.warn(
+                            "#{type.name} is used as the port type for #{name}, "\
+                            "logging it will not be possible"
+                        )
+                    end
+                    super(name, type, *args, **options)
+                end
+
+                def input_port(name, type, *args, **options)
+                    RTT_CPP.verify_valid_identifier(name, "input port")
+                    type = validate_interface_type(type)
+                    super(name, type, *args, **options)
+                end
+
+                def property(name, type, *args, **options)
+                    RTT_CPP.verify_valid_identifier(name, "property")
+                    type = validate_interface_type(type)
+                    super(name, type, *args, **options)
+                end
+
+                def attribute(name, type, *args, **options)
+                    RTT_CPP.verify_valid_identifier(name, "attribute")
+                    type = validate_interface_type(type)
+                    super(name, type, *args, **options)
+                end
+
+                def validate_interface_type(type)
+                    type = project.find_interface_type(type)
+                    OroGen.validate_toplevel_type(type)
+                    type
+                end
+
                 # This method generates the relative basepath for generation of all files
                 def basepath
                     s = File.join(namespace.split("::").join(File::SEPARATOR))
@@ -349,7 +386,9 @@ EOF
                     name
                 end
 
-                def initialize(*, **)
+                def initialize(project, name = nil, **)
+                    RTT_CPP.verify_valid_identifier(name, "task") if name
+
                     super
 
                     hooks = %w{configure start update error exception fatal stop cleanup}
