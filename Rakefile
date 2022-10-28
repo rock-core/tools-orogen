@@ -62,7 +62,7 @@ Rake::TestTask.new(:test) do |t|
     t.warning = false
 
     t.test_files = FileList.new("test/**/test_*.rb") do |fl|
-        fl.exclude { |p| %r{^test/gen}.match?(p) && (p != "test/gen/test_base.rb") }
+        fl.exclude { |p| %r{^test/gen}.match?(p) }
     end
 end
 
