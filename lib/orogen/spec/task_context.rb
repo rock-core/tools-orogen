@@ -1117,7 +1117,8 @@ module OroGen
                 check_uniqueness(name)
                 type = project.resolve_type(type)
 
-                @output_ports[name] = port = options[:class].new(self, name, type)
+                port = options[:class].new(self, name, type)
+                @output_ports[name] = port
                 Spec.load_documentation(port, /output_port/)
                 port
             end
@@ -1134,7 +1135,8 @@ module OroGen
                 check_uniqueness(name)
                 type = project.resolve_type(type)
 
-                @input_ports[name] = port = options[:class].new(self, name, type)
+                port = options[:class].new(self, name, type)
+                @input_ports[name] = port
                 Spec.load_documentation(port, /input_port/)
                 port
             end
