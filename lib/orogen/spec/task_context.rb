@@ -613,7 +613,7 @@ module OroGen
             end
 
             def configuration_object(klass, name, type, default_value)
-                type = resolve_type_if_needed(type)
+                type = project.resolve_type(type)
 
                 if default_value
                     accepted = [Numeric, Symbol, String, TrueClass, FalseClass]
@@ -630,13 +630,6 @@ module OroGen
                 end
 
                 klass.new(self, name, type, default_value)
-            end
-
-            # @api private
-            #
-            # Resolve a type name into a type object, and leave type object alone
-            def resolve_type_if_needed(type)
-                project.resolve_type(type)
             end
 
             # Create a new property with the given name, type and default value
@@ -1122,7 +1115,7 @@ module OroGen
             def output_port(name, type, **options)
                 options = validate_options(options, class: OutputPort)
                 check_uniqueness(name)
-                type = resolve_type_if_needed(type) if type
+                type = project.resolve_type(type)
 
                 @output_ports[name] = port = options[:class].new(self, name, type)
                 Spec.load_documentation(port, /output_port/)
@@ -1139,7 +1132,7 @@ module OroGen
             def input_port(name, type, **options)
                 options = Kernel.validate_options(options, class: InputPort)
                 check_uniqueness(name)
-                type = resolve_type_if_needed(type) if type
+                type = project.resolve_type(type)
 
                 @input_ports[name] = port = options[:class].new(self, name, type)
                 Spec.load_documentation(port, /input_port/)
@@ -1275,7 +1268,7 @@ module OroGen
             # at runtime, with the type. This is not used by orogen himself, but
             # can be used by potential users of the orogen specification.
             def dynamic_input_port(name, type)
-                type = resolve_type_if_needed(type) if type
+                type = project.resolve_type(type) if type
                 dynamic_ports << DynamicInputPort.new(self, name, type)
                 dynamic_ports.last
             end
@@ -1287,7 +1280,7 @@ module OroGen
             # at runtime, with the type. This is not used by orogen himself, but
             # can be used by potential users of the orogen specification.
             def dynamic_output_port(name, type)
-                type = resolve_type_if_needed(type) if type
+                type = project.resolve_type(type) if type
                 dynamic_ports << DynamicOutputPort.new(self, name, type)
                 dynamic_ports.last
             end
