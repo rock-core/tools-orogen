@@ -619,7 +619,10 @@ module OroGen
                     accepted = [Numeric, Symbol, String, TrueClass, FalseClass]
                                .any? { |valid_klass| default_value.kind_of?(valid_klass) }
                     unless accepted
-                        raise ArgumentError, "default values for #{klass.name.downcase} can be specified only for simple types (numeric, string and boolean)"
+                        raise ArgumentError,
+                              "default values for #{klass.name} can be specified only for "\
+                              "simple types (numeric, string and boolean). Got #{default_value} "\
+                              "of type #{default_value.class}"
                     end
 
                     begin
