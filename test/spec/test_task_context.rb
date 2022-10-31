@@ -72,13 +72,6 @@ describe OroGen::Spec::TaskContext do
             assert_raises(ArgumentError) { task.property("bla", "/double") }
         end
 
-        it "should validate property names" do
-            assert_raises(ArgumentError) { task.property("bla bla", "/double") }
-            assert_raises(ArgumentError) { task.property("bla(bla", "/double") }
-            assert_raises(ArgumentError) { task.property("bla!bla", "/double") }
-            assert_raises(ArgumentError) { task.property("bla/bla", "/double") }
-        end
-
         it "should register the property in #self_properties" do
             property = task.property("p", "/double")
             assert_equal [property], task.self_properties

@@ -606,26 +606,23 @@ module OroGen
             #   attribute('device_name', '/std/string/, '').
             #       doc 'the device name to connect to'
             def attribute(name, type, default_value = nil)
-                @attributes[name] = att = configuration_object(Attribute, name, type, default_value)
+                att = configuration_object(Attribute, name, type, default_value)
+                @attributes[name] = att
                 Spec.load_documentation(att, /attribute/)
                 att
             end
 
             def configuration_object(klass, name, type, default_value)
-                name = OroGen.verify_valid_identifier(name)
-                check_uniqueness(name)
-
-                begin
-                    type = project.find_interface_type(type)
-                rescue Typelib::NotFound => e
-                    raise ConfigError, "invalid type #{type}: #{e.message}", e.backtrace
-                end
+                type = project.resolve_type(type)
 
                 if default_value
                     accepted = [Numeric, Symbol, String, TrueClass, FalseClass]
                                .any? { |valid_klass| default_value.kind_of?(valid_klass) }
                     unless accepted
-                        raise ArgumentError, "default values for #{klass.name.downcase} can be specified only for simple types (numeric, string and boolean)"
+                        raise ArgumentError,
+                              "default values for #{klass.name} can be specified only for "\
+                              "simple types (numeric, string and boolean). Got #{default_value} "\
+                              "of type #{default_value.class}"
                     end
 
                     begin
@@ -651,7 +648,10 @@ module OroGen
             #   property('device_name', '/std/string/, '').
             #       doc 'the device name to connect to'
             def property(name, type, default_value = nil)
-                @properties[name] = prop = configuration_object(Property, name, type, default_value)
+                prop = configuration_object(Property, name, type, default_value)
+                check_uniqueness(name)
+
+                @properties[name] = prop
                 Spec.load_documentation(prop, /property/)
                 prop
             end
@@ -1115,13 +1115,13 @@ module OroGen
             # corresponding OutputPort object.
             #
             # See also #input_port
-            def output_port(name, type, options = Hash.new)
-                name = OroGen.verify_valid_identifier(name)
+            def output_port(name, type, **options)
+                options = validate_options(options, class: OutputPort)
                 check_uniqueness(name)
-                options = Kernel.validate_options options,
-                                                  :class => OutputPort
+                type = project.resolve_type(type)
 
-                @output_ports[name] = port = options[:class].new(self, name, type)
+                port = options[:class].new(self, name, type)
+                @output_ports[name] = port
                 Spec.load_documentation(port, /output_port/)
                 port
             end
@@ -1133,13 +1133,13 @@ module OroGen
             # corresponding InputPort object.
             #
             # See also #output_port
-            def input_port(name, type, options = Hash.new)
-                name = OroGen.verify_valid_identifier(name)
+            def input_port(name, type, **options)
+                options = Kernel.validate_options(options, class: InputPort)
                 check_uniqueness(name)
-                options = Kernel.validate_options options,
-                                                  :class => InputPort
+                type = project.resolve_type(type)
 
-                @input_ports[name] = port = options[:class].new(self, name, type)
+                port = options[:class].new(self, name, type)
+                @input_ports[name] = port
                 Spec.load_documentation(port, /input_port/)
                 port
             end
@@ -1211,9 +1211,7 @@ module OroGen
 
             # Enumerates both the input and output ports
             def each_port(&block)
-                unless block_given?
-                    return enum_for(:each_port, &block)
-                end
+                return enum_for(:each_port) unless block_given?
 
                 each_input_port(&block)
                 each_output_port(&block)
@@ -1275,6 +1273,7 @@ module OroGen
             # at runtime, with the type. This is not used by orogen himself, but
             # can be used by potential users of the orogen specification.
             def dynamic_input_port(name, type)
+                type = project.resolve_type(type) if type
                 dynamic_ports << DynamicInputPort.new(self, name, type)
                 dynamic_ports.last
             end
@@ -1286,6 +1285,7 @@ module OroGen
             # at runtime, with the type. This is not used by orogen himself, but
             # can be used by potential users of the orogen specification.
             def dynamic_output_port(name, type)
+                type = project.resolve_type(type) if type
                 dynamic_ports << DynamicOutputPort.new(self, name, type)
                 dynamic_ports.last
             end
@@ -1302,10 +1302,10 @@ module OroGen
             # given name and type pair. If +type+ is nil, the type is ignored in
             # the matching.
             def find_dynamic_input_ports(name, type)
-                if type
-                    type = project.find_type(type)
+                type = loader.resolve_type(type) if type
+                each_dynamic_input_port.find_all do |p|
+                    (!type || !p.type || p.type == type) && p.name === name
                 end
-                each_dynamic_input_port.find_all { |p| (!type || !p.type || p.type == type) && p.name === name }
             end
 
             # Returns true if there is an input port definition that match the
@@ -1319,10 +1319,10 @@ module OroGen
             # given name and type pair. If +type+ is nil, the type is ignored in
             # the matching.
             def find_dynamic_output_ports(name, type)
-                if type
-                    type = project.find_type(type)
+                type = loader.resolve_type(type) if type
+                each_dynamic_output_port.find_all do |p|
+                    (!type || !p.type || p.type == type) && p.name === name
                 end
-                each_dynamic_output_port.find_all { |p| (!type || !p.type || p.type == type) && p.name === name }
             end
 
             # Returns true if an output port of the given name and type could be

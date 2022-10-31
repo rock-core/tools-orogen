@@ -35,7 +35,7 @@ module OroGen
             Type = Struct.new :name, :exported
 
             def to_s
-                "#<OroGen::Loaders::PkgConfig(#{object_id.to_s(16)}) #{orocos_target}>"
+                "#<#{self.class}(#{object_id.to_s(16)}) #{orocos_target}>"
             end
 
             # @return [String] the name of the orocos target we are looking for

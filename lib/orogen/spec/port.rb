@@ -98,13 +98,8 @@ module OroGen
                 false
             end
 
-            def initialize(task, name, type, options = Hash.new)
-                if !name.kind_of?(Regexp)
-                    name = name.to_s
-                    if name !~ /^\w+$/
-                        raise ArgumentError, "port names need to be valid C++ identifiers, i.e. contain only alphanumeric characters and _ (got #{name})"
-                    end
-                elsif !type && !dynamic?
+            def initialize(task, name, type)
+                if !type && !dynamic?
                     raise ArgumentError, "only dynamic ports are allowed to have no type"
                 end
 
@@ -112,9 +107,15 @@ module OroGen
                     type = task.project.find_interface_type(type)
                     OroGen.validate_toplevel_type(type)
                     if type.name == "/std/vector<double>"
-                        Spec.warn "#{type.name} is used as the port type for #{name}, logging it will not be possible"
+                        Spec.warn(
+                            "#{type.name} is used as the port type for #{name}, "\
+                            "logging it will not be possible"
+                        )
                     end
                 end
+
+                name = name.to_s unless name.kind_of?(Regexp)
+
                 @task = task
                 @name = name
                 @type = type

@@ -19,6 +19,19 @@ module OroGen
                 generated_files << path
             end
 
+            def self.verify_valid_identifier(name, category)
+                name = name.to_s if name.respond_to?(:to_sym)
+                name = name.to_str
+                if name !~ /^[a-zA-Z0-9_:][a-zA-Z0-9_:]*$/
+                    raise ArgumentError,
+                          "#{category} name '#{name}' invalid: it may contain only "\
+                          "alphanumeric characters and '_', and cannot start "\
+                          "with a number"
+                end
+
+                name
+            end
+
             # Returns the C++ code which changes the current namespace from +old+
             # to +new+. +indent_size+ is the count of indent spaces between
             # namespaces.
@@ -100,11 +113,10 @@ module OroGen
             end
 
             def self.each_pkgconfig_link_dependency(context, depspec)
-                return enum_for(:each_pkgconfig_link_dependency, context, depspec) unless block_given?
+                return enum_for(__method__, context, depspec) unless block_given?
+
                 depspec.each do |s|
-                    if s.in_context?(context, "link")
-                        yield "${#{s.var_name}_LIBRARIES}"
-                    end
+                    yield "${#{s.var_name}_LIBRARIES}" if s.in_context?(context, "link")
                 end
             end
 

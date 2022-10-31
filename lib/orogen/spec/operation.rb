@@ -47,13 +47,8 @@ module OroGen
             RTT_ARGUMENT_COUNT_LIMIT = 4
 
             def initialize(task, name)
-                name = name.to_s
-                if name !~ /^\w+$/
-                    raise ArgumentError, "#{self.class.name.downcase} names need to be valid C++ identifiers, i.e. contain only alphanumeric characters and _ (got #{name})"
-                end
-
                 @task = task
-                @name = name
+                @name = name.to_s
                 @return_type = [nil, "void", ""]
                 @arguments = []
                 @in_caller_thread = false
@@ -131,7 +126,9 @@ module OroGen
             # error
             def argument(name, qualified_type, doc = "")
                 if arguments.size >= RTT_ARGUMENT_COUNT_LIMIT
-                    raise ArgumentError, "RTT does not support having more than #{RTT_ARGUMENT_COUNT_LIMIT} arguments for an operation"
+                    raise ArgumentError,
+                          "RTT does not support having more than "\
+                          "#{RTT_ARGUMENT_COUNT_LIMIT} arguments for an operation"
                 end
 
                 type, qualified_type = find_interface_type(qualified_type)

@@ -351,7 +351,7 @@ module OroGen
             # @return [Model<Typelib::Type>] the corresponding type in
             #   {#registry}
             # @raise Typelib::NotFound if the type cannot be found
-            def resolve_type(type, options = {})
+            def resolve_type(type, define_dummy_type: false)
                 typename =
                     if type.respond_to?(:name)
                         type.name
@@ -359,7 +359,7 @@ module OroGen
                     end
                 registry.get(typename)
             rescue Typelib::NotFound => e
-                unless define_dummy_types? || options[:define_dummy_type]
+                unless define_dummy_types? || define_dummy_type
                     raise e, "#{e.message} using #{self}", e.backtrace
                 end
 
