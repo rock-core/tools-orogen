@@ -306,7 +306,7 @@ EOF
             # <tt>_time</tt> to be added to the generated class (more specifically,
             # to the +Base+ subclass).
             module TaskContextGeneration
-                def output_port(name, type, *args, **options)
+                def output_port(name, type, **options)
                     RTT_CPP.verify_valid_identifier(name, "output port")
                     type = validate_interface_type(type)
 
@@ -316,25 +316,25 @@ EOF
                             "logging it will not be possible"
                         )
                     end
-                    super(name, type, *args, **options)
+                    super(name, type, **options)
                 end
 
-                def input_port(name, type, *args, **options)
+                def input_port(name, type, **options)
                     RTT_CPP.verify_valid_identifier(name, "input port")
                     type = validate_interface_type(type)
-                    super(name, type, *args, **options)
+                    super(name, type, **options)
                 end
 
-                def property(name, type, *args, **options)
+                def property(name, type, default_value = nil)
                     RTT_CPP.verify_valid_identifier(name, "property")
                     type = validate_interface_type(type)
-                    super(name, type, *args, **options)
+                    super(name, type, default_value)
                 end
 
-                def attribute(name, type, *args, **options)
+                def attribute(name, type, default_value = nil)
                     RTT_CPP.verify_valid_identifier(name, "attribute")
                     type = validate_interface_type(type)
-                    super(name, type, *args, **options)
+                    super(name, type, default_value)
                 end
 
                 def validate_interface_type(type)
