@@ -17,6 +17,10 @@ module OroGen
             attr_reader :burst_size
             attr_reader :burst_period
 
+            def input?
+                false
+            end
+
             # call-seq:
             #   sample_size new_size -> self
             #   sample_size -> size

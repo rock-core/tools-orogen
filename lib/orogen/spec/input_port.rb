@@ -13,6 +13,10 @@ module OroGen
 
             attr_predicate :trigger_port?, true
 
+            def input?
+                true
+            end
+
             # If called, this port will be registered on the task as a trigger
             # port,
             #
