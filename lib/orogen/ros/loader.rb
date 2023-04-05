@@ -10,7 +10,7 @@ module OroGen
             #   models
             attr_accessor :spec_file_suffix
             # @return [Hash<String,String>] mapping from a package name to its
-            #   full path. This is used as both a cache for {ROS.rospack_find},
+            #   full path. This is used as both a cache for {#rospack_find},
             #   and as a way to register paths for launchfiles on systems that
             #   do not have ROS installed
             attr_reader :package_paths

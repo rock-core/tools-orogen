@@ -66,7 +66,7 @@ module OroGen
 
             class << self
                 # Make the given list of extensions the default until the next
-                # {#pop_default_extensions_state}
+                # {TaskContext.pop_default_extensions_state}
                 #
                 # Default extensions are the extensions that are enabled when a
                 # task context is created. This method allows to locally
@@ -78,7 +78,7 @@ module OroGen
                 end
 
                 # Pop the extensions enabled at this level, reverting to the
-                # list before the last call to {#push_default_extensions_state}
+                # list before the last call to {TaskContext.push_default_extensions_state}
                 def pop_default_extensions_state
                     @default_extensions_state.pop if @default_extensions_state.size > 1
                 end
@@ -207,7 +207,7 @@ module OroGen
             # initializer in the global main
             #
             # @param [Symbol] key the initializer name. It must be previously
-            #   registered with {Spec::Deployment#register_global_initializer}.
+            #   registered with {Spec::Deployment.register_global_initializer}.
             def needs_global_initializer(key)
                 unless Spec::Deployment.has_global_initializer?(key)
                     raise ArgumentError, "unknown global initializer '#{key}'"
@@ -808,7 +808,7 @@ module OroGen
                 @states.each(&block)
             end
 
-            # @deprecated use {toplevel_state} to define toplevel states on root
+            # @deprecated use {#toplevel_states} to define toplevel states on root
             #   models, and {#each_state} to enumerate the states
             def states(*state_names) # :nodoc:
                 if state_names.empty?

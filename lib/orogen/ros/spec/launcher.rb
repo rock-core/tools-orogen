@@ -26,9 +26,9 @@ module OroGen
                     end
 
                     # Initialize the node description
-                    # @argument name Name of the node
-                    # @argument package Package name of the node
-                    # @argument type ROS node type of this node
+                    # @param name Name of the node
+                    # @param package Package name of the node
+                    # @param type ROS node type of this node
                     def initialize(name, package, type)
                         @name = name
                         @package = package
