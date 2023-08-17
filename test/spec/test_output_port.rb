@@ -18,4 +18,3 @@ module OroGen
         end
     end
 end
-
