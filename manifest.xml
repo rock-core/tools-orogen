@@ -23,6 +23,9 @@
     <rosdep name="ruby" />
 
     <test_depend package="minitest" />
+    <test_depend package="minitest-junit" />
     <test_depend package="flexmock" />
+    <test_depend package="rubocop" />
+    <test_depend package="rubocop-rock" />
 </package>
 

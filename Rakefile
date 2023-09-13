@@ -55,7 +55,7 @@ def minitest_set_options(test_task, name)
     test_task.options = "#{TESTOPTS} #{minitest_args} -- --simplecov-name=#{name}"
 end
 
-Rake::TestTask.new(:test) do |t|
+Rake::TestTask.new("test:core") do |t|
     t.libs << "lib"
     minitest_set_options(t, "core")
     t.libs << "test"
@@ -65,6 +65,8 @@ Rake::TestTask.new(:test) do |t|
         fl.exclude { |p| %r{^test/gen}.match?(p) }
     end
 end
+
+task "test" => "test:core"
 
 Rake::TestTask.new("test:gen") do |t|
     t.libs << "lib"
