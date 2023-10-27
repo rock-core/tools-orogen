@@ -410,7 +410,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
         so, as we can't shutdown the ORB from the signal handler */
     if (pipe(sigint_com) == -1)
     {
-        std::cerr << "failed to setup SIGINT handler: " << strerror(errno) << std::endl;
+        std::cerr << "failed to setup SIGINT/SIGTERM/SIGQUIT/SIGHUP communication pipe: " << strerror(errno) << std::endl;
         return 1;
     }
 
@@ -423,12 +423,30 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
         std::cerr << "failed to install SIGINT handler" << std::endl;
         return 1;
     }
+    if (-1 == sigaction(SIGTERM, &sigint_handler, 0))
+    {
+        std::cerr << "failed to install SIGTERM handler" << std::endl;
+        return 1;
+    }
+    if (-1 == sigaction(SIGQUIT, &sigint_handler, 0))
+    {
+        std::cerr << "failed to install SIGQUIT handler" << std::endl;
+        return 1;
+    }
+    if (-1 == sigaction(SIGHUP, &sigint_handler, 0))
+    {
+        std::cerr << "failed to install SIGHUP handler" << std::endl;
+        return 1;
+    }
     sigset_t unblock_sigint;
     sigemptyset(&unblock_sigint);
     sigaddset(&unblock_sigint, SIGINT);
+    sigaddset(&unblock_sigint, SIGTERM);
+    sigaddset(&unblock_sigint, SIGQUIT);
+    sigaddset(&unblock_sigint, SIGHUP);
     if (-1 == sigprocmask(SIG_UNBLOCK, &unblock_sigint, NULL))
     {
-        std::cerr << "failed to install SIGINT handler" << std::endl;
+        std::cerr << "failed to unblock SIGINT/SIGTERM/SIGQUIT/SIGHUP handler" << std::endl;
         return 1;
     }
 
