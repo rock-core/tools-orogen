@@ -175,7 +175,8 @@ int ORO_main(int argc, char* argv[])
 <% end %>
         ("with-ros", po::value<bool>()->default_value(false), "also publish the task as ROS node, default is false")
         ("rename", po::value< std::vector<std::string> >(), "rename a task of the deployment: --rename oldname:newname")
-        ("ior-write-fd", po::value<int>(), "the write file descriptor of the ior pipe");
+        ("ior-write-fd", po::value<int>(), "the write file descriptor of the ior pipe")
+        ("register-on-name-server", po::value<bool>()->default_value(true), "whether the tasks should be registered on the default CORBA naming service");
 
    po::variables_map vm;
    po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -224,10 +225,8 @@ int ORO_main(int argc, char* argv[])
     if( vm.count("prefix"))
         prefix = vm["prefix"].as<std::string>();
 
-    bool with_ros = false;
-
-    if( vm.count("with-ros"))
-	with_ros = vm["with-ros"].as<bool>();
+    bool with_ros = vm["with-ros"].as<bool>();
+    bool use_naming = vm["register-on-name-server"].as<bool>();
 
     std::string task_name;
 
@@ -287,7 +286,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
 #endif
 
     <% if deployer.corba_enabled? %>
-    RTT::corba::TaskContextServer::Create( task_<%= task.name %>.get() );
+    RTT::corba::TaskContextServer::Create( task_<%= task.name %>.get(), use_naming );
     <% if task.realtime? %>
 #if RTT_VERSION_GTE(2,8,99)
     task_<%= task.name %>.get()->addConstant<int>("CorbaDispatcherScheduler", ORO_SCHED_RT);
