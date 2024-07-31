@@ -288,7 +288,7 @@ module OroGen
             end
 
             def periodic?
-                activity_type.name == "Triggered" && period != 0
+                activity_type.name == "Periodic" && period != 0
             end
 
             def fd_driven?
