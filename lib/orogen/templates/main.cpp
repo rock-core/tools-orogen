@@ -217,7 +217,10 @@ int ORO_main(int argc, char* argv[])
    <% end %>
 
 <% if deployer.corba_enabled? %>
-    RTT::corba::ApplicationServer::InitOrb(argc, argv);
+    if (!RTT::corba::ApplicationServer::InitOrb(argc, argv)) {
+        std::cerr << "Failed to initialize the ORB" << std::endl;
+        return 1;
+    }
 <% end %>
 
     std::string prefix = "";
@@ -465,8 +468,19 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
 
         message_ostream << "{";
     <% activity_ordered_tasks.each do |task| %>
-        ior = RTT::corba::TaskContextServer::getIOR(task_<%= task.name %>.get());
-        message_ostream << "\"" << task_<%= task.name %>.get()->getName() << "\": \"" << ior << "\"";
+        {
+            auto task = task_<%= task.name %>.get();
+            std::string ior = RTT::corba::TaskContextServer::getIOR(task);
+            std::string name = task->getName();
+            if (ior.empty()) {
+                std::cerr
+                    << "internal error: task " << name << " has not registered its IOR"
+                    << std::endl;
+                return 1;
+            }
+
+            message_ostream << "\"" << name << "\": \"" << ior << "\"";
+        }
     <% if task != activity_ordered_tasks.last %>
         message_ostream << ",";
     <% end %>
@@ -487,7 +501,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
 
     oro_thread(NULL);
 
-    RTT::corba::TaskContextServer::ShutdownOrb();
+    RTT::corba::TaskContextServer::ShutdownOrb(true);
     RTT::corba::TaskContextServer::DestroyOrb();
 <% elsif deployer.browse %>
     OCL::TaskBrowser browser(task_<%= deployer.browse.name %>.get());
