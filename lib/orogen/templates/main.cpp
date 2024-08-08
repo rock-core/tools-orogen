@@ -490,7 +490,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
 
     oro_thread(NULL);
 
-    RTT::corba::TaskContextServer::ShutdownOrb();
+    RTT::corba::TaskContextServer::ShutdownOrb(true);
     RTT::corba::TaskContextServer::DestroyOrb();
 <% elsif deployer.browse %>
     OCL::TaskBrowser browser(task_<%= deployer.browse.name %>.get());
