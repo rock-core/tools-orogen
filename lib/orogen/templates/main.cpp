@@ -217,7 +217,10 @@ int ORO_main(int argc, char* argv[])
    <% end %>
 
 <% if deployer.corba_enabled? %>
-    RTT::corba::ApplicationServer::InitOrb(argc, argv);
+    if (!RTT::corba::ApplicationServer::InitOrb(argc, argv)) {
+        std::cerr << "Failed to initialize the ORB" << std::endl;
+        return 1;
+    }
 <% end %>
 
     std::string prefix = "";
