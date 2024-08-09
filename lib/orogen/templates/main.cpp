@@ -485,7 +485,7 @@ RTT::internal::GlobalEngine::Instance(ORO_SCHED_OTHER, RTT::os::LowestPriority);
         message_ostream << ",";
     <% end %>
     <% end %>
-        message_ostream << "}";
+        message_ostream << "}\n";
         std::string message = message_ostream.str();
         while (write_result < static_cast<int>(message.length())) {
             message.erase(0, write_result);
