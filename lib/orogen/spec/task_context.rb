@@ -356,6 +356,8 @@ module OroGen
 
             # Declares that this task should be deployed using a default
             # periodic activity, with the given period
+            #
+            # @param [Float] period the period in seconds
             def periodic(period)
                 default_activity :periodic, period
             end
@@ -1337,8 +1339,11 @@ module OroGen
             # Declares that this task context is designed to be woken up when
             # new data is available on one of the given ports (or all already
             # defined ports if no names are given).
-            def port_driven(*names)
-                default_activity "triggered"
+            #
+            # @param [Float,nil] timeout in seconds. If non-nil, the task will be
+            #   called after this many seconds have passed without being triggered
+            def port_driven(*names, timeout: nil)
+                default_activity "triggered", timeout: timeout
                 names = names.map(&:to_s)
                 relevant_ports =
                     if names.empty? then all_input_ports
