@@ -379,17 +379,28 @@ thread_#{name}->setMaxOverrun(#{max_overruns});
 
             # Marks this task as being explicitely triggered (the default). To
             # make it periodic, call #period with the required period
-            def triggered
+            def triggered(timeout: nil)
                 activity_type "Triggered", "RTT::Activity", "rtt/Activity.hpp"
                 activity_setup do
-                    <<-EOD
-#{activity_type.class_name}* activity_#{name} = new #{activity_type.class_name}(
-    #{rtt_scheduler},
-    #{rtt_priority},
-    0,
-    task_#{name}->engine(),
-    "#{name}");
+                    activity_new = <<~EOD
+                        #{activity_type.class_name}* activity_#{name} =
+                            new #{activity_type.class_name}(
+                                #{rtt_scheduler},
+                                #{rtt_priority},
+                                0,
+                                task_#{name}->engine(),
+                                "#{name}"
+                            );
                     EOD
+
+                    if timeout
+                        activity_timeout = <<~EOD
+                            activity_#{name}->setAperiodicTriggerTimeout(
+                                #{((timeout || 0) * 1e9).round}
+                            );
+                        EOD
+                    end
+                    "#{activity_new}#{activity_timeout}"
                 end
                 activity_xml do
                     <<-EOD
