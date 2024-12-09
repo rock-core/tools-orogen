@@ -341,13 +341,14 @@ module OroGen
                     activity_type.name != "Periodic"
             end
 
-            # call-seq:
-            #   periodic(period_in_seconds) -> self
+            # Declare that this deployed task's is periodic
             #
-            # Sets this task as being periodic. Call #period to return the
+            # Sets this task as being periodic. Call {#period} to return the
             # current task's period (or nil if the task is not periodic), and
             # one of the other triggering methods if you want a different
             # activity type.
+            #
+            # @param [Float] value period in seconds
             def periodic(value)
                 activity_type "Periodic", "RTT::Activity", "rtt/Activity.hpp"
                 activity_setup do
@@ -379,17 +380,32 @@ thread_#{name}->setMaxOverrun(#{max_overruns});
 
             # Marks this task as being explicitely triggered (the default). To
             # make it periodic, call #period with the required period
-            def triggered
+            #
+            # @param [Float,nil] timeout timeout in seconds or nil for no timeout.
+            #   If this timeout is given, the task will be called after this many
+            #   seconds have passed without an explicit trigger.
+            def triggered(timeout: nil)
                 activity_type "Triggered", "RTT::Activity", "rtt/Activity.hpp"
                 activity_setup do
-                    <<-EOD
-#{activity_type.class_name}* activity_#{name} = new #{activity_type.class_name}(
-    #{rtt_scheduler},
-    #{rtt_priority},
-    0,
-    task_#{name}->engine(),
-    "#{name}");
+                    activity_new = <<~EOD
+                        #{activity_type.class_name}* activity_#{name} =
+                            new #{activity_type.class_name}(
+                                #{rtt_scheduler},
+                                #{rtt_priority},
+                                0,
+                                task_#{name}->engine(),
+                                "#{name}"
+                            );
                     EOD
+
+                    if timeout
+                        activity_timeout = <<~EOD
+                            activity_#{name}->setAperiodicTriggerTimeout(
+                                #{((timeout || 0) * 1e9).round}
+                            );
+                        EOD
+                    end
+                    "#{activity_new}#{activity_timeout}"
                 end
                 activity_xml do
                     <<-EOD
