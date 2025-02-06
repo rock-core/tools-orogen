@@ -135,6 +135,18 @@ module OroGen
             def triggered_once_per_update?
                 !!@triggered_once_per_update
             end
+
+            # Used to set the recommend_init flag directly
+            attr_writer :recommend_init
+
+            # Returns whether the port recommends using 'init: true' when connecting.
+            # This policy flag requests that the connection sends the last value
+            # written to it.
+            #
+            # Defaults to true if not explicitly set
+            def recommend_init
+                @recommend_init.nil? ? true : @recommend_init
+            end
         end
     end
 end
