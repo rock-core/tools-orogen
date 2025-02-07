@@ -16,18 +16,41 @@ module OroGen
                 refute @port.input?
             end
 
-            it "defaults recommend_init to true" do
-                assert @port.recommend_init
+            it "initializes init_policy as nil" do
+                assert_nil @port.init_policy
             end
 
-            it "allows recommend_init to be explicitly set to false" do
-                @port.recommend_init = false
-                refute @port.recommend_init
-            end
-
-            it "sets recommend_init when recommends_init is called" do
+            it "resets init_policy when port is created again" do
                 @port.recommend_init
-                assert @port.recommend_init
+                assert @port.init_policy
+                @port = OutputPort.new(@task, "test", "/double")
+                assert_nil @port.init_policy
+            end
+
+            it "defaults keep_last_written_value to :initial" do
+                assert_equal @port.keep_last_written_value, :initial
+            end
+
+            it "calls keep_last_written_value(true) with recommend_init" do
+                @port.recommend_init
+                assert @port.keep_last_written_value
+            end
+
+            it "calls keep_last_written_value(false) with " \
+               "recommend_init(init: false)" do
+                @port.recommend_init(init: false)
+                refute @port.keep_last_written_value
+            end
+
+            it "raises ArgumentError if recommend_init is called " \
+               "with an invalid value (other than true or false)" do
+                begin
+                    @port.recommend_init(init: nil)
+                rescue ArgumentError => e
+                    assert_equal e.message,
+                                 "recommend_init can only be called with " \
+                                 "true or false. Got nil"
+                end
             end
         end
     end
