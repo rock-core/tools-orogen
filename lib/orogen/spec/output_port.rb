@@ -12,6 +12,7 @@ module OroGen
                 @burst_period = 0
                 @port_triggers = Set.new
                 @triggered_on_update = nil
+                @init_policy = nil
             end
 
             attr_reader :burst_size
@@ -136,16 +137,19 @@ module OroGen
                 !!@triggered_once_per_update
             end
 
-            # Used to set the recommend_init flag directly
-            attr_writer :recommend_init
+            # Stores the current init policy, as set by recommend_init
+            attr_reader :init_policy
 
-            # Returns whether the port recommends using 'init: true' when connecting.
-            # This policy flag requests that the connection sends the last value
-            # written to it.
-            #
-            # Defaults to true if not explicitly set
-            def recommend_init
-                @recommend_init.nil? ? true : @recommend_init
+            # Calls keep_last_written_value(true) as default
+            def recommend_init(init: true)
+                unless [true, false].include?(init)
+                    raise ArgumentError,
+                          "recommend_init can only be called with true or false. " \
+                          "Got #{init.nil? ? 'nil' : init}"
+                end
+
+                @init_policy = init
+                keep_last_written_value(init)
             end
         end
     end
