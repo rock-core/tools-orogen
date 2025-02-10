@@ -137,19 +137,20 @@ module OroGen
                 !!@triggered_once_per_update
             end
 
-            # Stores the current init policy, as set by recommend_init
-            attr_reader :init_policy
+            # Sets and gets the init policy
+            attr_writer :init_policy
 
-            # Calls keep_last_written_value(true) as default
-            def recommend_init(init: true)
-                unless [true, false].include?(init)
+            # Calls keep_last_written_value(value) if value is a Boolean
+            def init_policy(value = nil)
+                return @init_policy if value.nil?
+
+                unless [true, false].include?(value)
                     raise ArgumentError,
-                          "recommend_init can only be called with true or false. " \
-                          "Got #{init.nil? ? 'nil' : init}"
+                          "init_policy can only be called with " \
+                          "true or false. Got #{value.inspect}"
                 end
-
-                @init_policy = init
-                keep_last_written_value(init)
+                @init_policy = value
+                keep_last_written_value(value)
             end
         end
     end

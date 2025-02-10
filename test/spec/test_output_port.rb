@@ -21,7 +21,7 @@ module OroGen
             end
 
             it "resets init_policy when port is created again" do
-                @port.recommend_init
+                @port.init_policy(true)
                 assert @port.init_policy
                 @port = OutputPort.new(@task, "test", "/double")
                 assert_nil @port.init_policy
@@ -31,24 +31,35 @@ module OroGen
                 assert_equal @port.keep_last_written_value, :initial
             end
 
-            it "calls keep_last_written_value(true) with recommend_init" do
-                @port.recommend_init
+            it "calls keep_last_written_value(true) with init_policy(true)" do
+                @port.init_policy(true)
                 assert @port.keep_last_written_value
             end
 
-            it "calls keep_last_written_value(false) with " \
-               "recommend_init(init: false)" do
-                @port.recommend_init(init: false)
+            it "calls keep_last_written_value(false) with init_policy(false)" do
+                @port.init_policy(false)
                 refute @port.keep_last_written_value
             end
 
-            it "raises ArgumentError if recommend_init is called " \
+            it "sets init_policy to true and expects to get current value when " \
+               "calling init_policy" do
+                @port.init_policy(true)
+                assert @port.init_policy
+            end
+
+            it "sets init_policy to false and expects to get current value when " \
+               "calling init_policy" do
+                @port.init_policy(false)
+                refute @port.init_policy
+            end
+
+            it "raises ArgumentError if init_policy is called " \
                "with an invalid value (other than true or false)" do
                 begin
-                    @port.recommend_init(init: nil)
+                    @port.init_policy(nil)
                 rescue ArgumentError => e
                     assert_equal e.message,
-                                 "recommend_init can only be called with " \
+                                 "init_policy can only be called with " \
                                  "true or false. Got nil"
                 end
             end
