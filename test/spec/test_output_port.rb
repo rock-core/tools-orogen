@@ -16,15 +16,15 @@ module OroGen
                 refute @port.input?
             end
 
-            it "initializes init_policy as nil" do
-                assert_nil @port.init_policy
+            it "defaults init_policy as not defined (false)" do
+                refute @port.init_policy?
             end
 
             it "resets init_policy when port is created again" do
                 @port.init_policy(true)
-                assert @port.init_policy
+                assert @port.init_policy?
                 @port = OutputPort.new(@task, "test", "/double")
-                assert_nil @port.init_policy
+                refute @port.init_policy?
             end
 
             it "defaults keep_last_written_value to :initial" do
@@ -44,13 +44,13 @@ module OroGen
             it "sets init_policy to true and expects to get current value when " \
                "calling init_policy" do
                 @port.init_policy(true)
-                assert @port.init_policy
+                assert @port.init_policy?
             end
 
             it "sets init_policy to false and expects to get current value when " \
                "calling init_policy" do
                 @port.init_policy(false)
-                refute @port.init_policy
+                refute @port.init_policy?
             end
 
             it "raises ArgumentError if init_policy is called " \

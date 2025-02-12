@@ -137,6 +137,10 @@ module OroGen
                 !!@triggered_once_per_update
             end
 
+            def init_policy?
+                @init_policy == true
+            end
+
             # Calls keep_last_written_value(value) if value is a Boolean
             def init_policy(value = nil)
                 return @init_policy if value.nil?
