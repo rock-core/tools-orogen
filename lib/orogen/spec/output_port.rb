@@ -138,20 +138,21 @@ module OroGen
             end
 
             def init_policy?
-                @init_policy == true
+                @init_policy
             end
-
-            # Calls keep_last_written_value(value) if value is a Boolean
-            def init_policy(value = nil)
-                return @init_policy if value.nil?
-
-                unless [true, false].include?(value)
+             
+            # Calls keep_last_written_value(value)
+            def init_policy(*value)
+                return @init_policy if value.empty?
+                if value.size > 1
                     raise ArgumentError,
-                          "init_policy can only be called with " \
-                          "true or false. Got #{value.inspect}"
+                          "init_policy accepts at most one argument, " \
+                          "but got #{value.size}"
                 end
-                @init_policy = value
-                keep_last_written_value(value)
+
+                @init_policy = value.first
+                keep_last_written_value(value.first)
+                self
             end
         end
     end
