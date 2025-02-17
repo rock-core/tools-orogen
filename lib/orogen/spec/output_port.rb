@@ -12,6 +12,7 @@ module OroGen
                 @burst_period = 0
                 @port_triggers = Set.new
                 @triggered_on_update = nil
+                @init_policy = nil
             end
 
             attr_reader :burst_size
@@ -134,6 +135,24 @@ module OroGen
             # The port period and burst are still used
             def triggered_once_per_update?
                 !!@triggered_once_per_update
+            end
+
+            def init_policy?
+                @init_policy
+            end
+             
+            # Calls keep_last_written_value(value)
+            def init_policy(*value)
+                return @init_policy if value.empty?
+                if value.size > 1
+                    raise ArgumentError,
+                          "init_policy accepts at most one argument, " \
+                          "but got #{value.size}"
+                end
+
+                @init_policy = value.first
+                keep_last_written_value(value.first)
+                self
             end
         end
     end
