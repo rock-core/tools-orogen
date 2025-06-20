@@ -6,7 +6,7 @@ module OroGen
     def self.check_for_stray_dots(filename, name, args)
         # Building the regular expression to
         # match on the method name and arguments
-        regexp_expression = "#{name}.*"
+        regexp_expression = +"#{name}.*"
         args.each do |element|
             regexp_expression << "#{element}.*"
         end
