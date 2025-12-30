@@ -3,9 +3,25 @@
 module OroGen
     module Loaders
         class RTT < PkgConfig
+            def self.has_builtin_typekit?
+                ENV["ROCK_RTT_BUILTIN_TYPEKIT"] != "0"
+            end
+
             DIR = File.join(__dir__, "rtt")
-            STANDARD_PROJECT_SPECS = { "RTT" => DIR, "OCL" => DIR }
-            STANDARD_TYPEKIT_SPECS = { "orocos" => DIR }
+            STANDARD_PROJECT_SPECS =
+                if has_builtin_typekit?
+                    { "RTT" => DIR, "OCL" => DIR }
+                else
+                    { "RTT" => DIR }
+                end
+
+            STANDARD_TYPEKIT_SPECS =
+                if has_builtin_typekit?
+                    { "orocos" => DIR }
+                else
+                    {}
+                end
+
             def self.loader
                 loader = Files.new
                 STANDARD_PROJECT_SPECS.each do |name, dir|

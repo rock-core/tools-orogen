@@ -40,11 +40,15 @@ target_link_libraries(<%= deployer.name %> ${Boost_PROGRAM_OPTIONS_LIBRARIES} ${
 <% end %>
 
 list(APPEND CMAKE_PREFIX_PATH ${OrocosRTT_PREFIX})
+
+<% if OroGen::Loaders::RTT.has_builtin_typekit? %>
 find_package(RTTPlugin COMPONENTS rtt-typekit <%= deployer.rtt_transports.map { |transport_name| "rtt-transport-#{transport_name}" }.join(" ") %>)
 target_link_libraries(<%= deployer.name %> ${RTT_PLUGIN_rtt-typekit_LIBRARY})
 <% deployer.rtt_transports.each do |transport_name| %>
 target_link_libraries(<%= deployer.name %> ${RTT_PLUGIN_rtt-transport-<%= transport_name %>_LIBRARY})
 <% end %>
+<% end %>
+
 <% if !project.self_tasks.empty? %>
 target_link_libraries(<%= deployer.name %> <%= project.name %>-tasks-${OROCOS_TARGET})
 <% end %>

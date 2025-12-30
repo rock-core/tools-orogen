@@ -11,12 +11,14 @@
 #endif // OROGEN_SERVICE_DISCOVERY_ACTIVATED
 <% end %>
 
+<% if OroGen::Loaders::RTT.has_builtin_typekit? %>
 #include <rtt/typekit/RealTimeTypekit.hpp>
 <% if deployer.transports.include?('corba') %>
 #include <rtt/transports/corba/TransportPlugin.hpp>
 <% end %>
 <% if deployer.transports.include?('mqueue') %>
 #include <rtt/transports/mqueue/TransportPlugin.hpp>
+<% end %>
 <% end %>
 
 <% if project.typekit || !project.used_typekits.empty? %>
@@ -268,12 +270,14 @@ int ORO_main(int argc, char* argv[])
        <% end %>
    <% end %>
 
+   <% if OroGen::Loaders::RTT.has_builtin_typekit? %>
    RTT::types::TypekitRepository::Import( new RTT::types::RealTimeTypekitPlugin );
    <% if deployer.transports.include?('corba') %>
    RTT::types::TypekitRepository::Import( new RTT::corba::CorbaLibPlugin );
    <% end %>
    <% if deployer.transports.include?('mqueue') %>
    RTT::types::TypekitRepository::Import( new RTT::mqueue::MQLibPlugin );
+   <% end %>
    <% end %>
 
 <% if deployer.corba_enabled? %>
