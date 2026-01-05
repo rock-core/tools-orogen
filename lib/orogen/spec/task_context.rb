@@ -20,11 +20,17 @@ module OroGen
                 @name = name
             end
 
-            def supercall(default, m, *args, &block)
+            def supercall(default, m, *args, **kw, &block)
                 if !task.superclass
                     default
                 elsif name && @super_ext || (@super_ext = task.superclass.find_extension(name))
-                    @super_ext.send(m, *args, &block)
+                    # in ruby2.6, an empty kw hash will be passed as a positional
+                    # empty hash to a function that does not take keyword arguments
+                    if kw.empty?
+                        @super_ext.send(m, *args, &block)
+                    else
+                        @super_ext.send(m, *args, **kw, &block)
+                    end
                 else
                     default
                 end
