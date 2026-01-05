@@ -313,18 +313,30 @@ module OroGen
             ##
             # :method: required_activity
             # :call-seq:
-            #   required_activity 'activity_type', *args
+            #   required_activity 'activity_type', *args, **kw
             #
             # The kind of activity that must be used for this task context. This
             # is the name of the corresponding method on the deployment objects.
             # See ACTIVITY_TYPES for the list of known activity types.
             #
             # See also #default_activity
-            dsl_attribute :required_activity do |type, *args|
+            dsl_attribute :required_activity do |type, *args, **kw|
                 if respond_to?(type.to_sym)
-                    send(type.to_sym, *args)
+                    # in ruby2.6, an empty kw hash will be passed as a positional
+                    # empty hash to a function that does not take keyword arguments
+                    if kw.empty?
+                        send(type.to_sym, *args)
+                    else
+                        send(type.to_sym, *args, **kw)
+                    end
                 else
-                    default_activity type, *args
+                    # in ruby2.6, an empty kw hash will be passed as a positional
+                    # empty hash to a function that does not take keyword arguments
+                    if kw.empty?
+                        default_activity type, *args
+                    else
+                        default_activity type, *args, **kw
+                    end
                 end
                 self.required_activity = true
             end
@@ -332,7 +344,7 @@ module OroGen
             ##
             # :method: default_activity
             # :call-seq:
-            #   default_activity 'activity_type', *args
+            #   default_activity 'activity_type', *args, **kw
             #
             # The kind of activity that should be used by default. This is the
             # name of the corresponding method on the deployment objects
@@ -344,7 +356,7 @@ module OroGen
             # with this task context.
             #
             # See also #required_activity
-            dsl_attribute :default_activity do |type, *args|
+            dsl_attribute :default_activity do |type, *args, **kw|
                 if required_activity? && @default_activity
                     raise ArgumentError,
                           "the #{default_activity[0]} activity is required, you cannot change it"
@@ -355,7 +367,7 @@ module OroGen
                     raise ArgumentError, "#{type} is not a valid activity type"
                 end
 
-                [type, *args]
+                [type, args, kw]
             end
 
             # Declares that this task should be deployed using a default
