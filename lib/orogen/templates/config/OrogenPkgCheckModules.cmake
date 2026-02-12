@@ -12,6 +12,13 @@ macro(orogen_pkg_check_modules VARNAME)
         endforeach()
         list(APPEND _${VARNAME}_LIBRARIES ${${VARNAME}_LDFLAGS_OTHER})
         set(${VARNAME}_LIBRARIES ${_${VARNAME}_LIBRARIES} CACHE INTERNAL "")
+
+        foreach(__orogen_cflag ${${VARNAME}_CFLAGS_OTHER})
+            if (NOT __orogen_cflag MATCHES "^-std=")
+                list(APPEND __orogen_filtered_cflags ${__orogen_cflag})
+            endif()
+        endforeach()
+        set(${VARNAME}_CFLAGS_OTHER ${__orogen_filtered_cflags} CACHE INTERNAL "")
     endif()
 endmacro()
 
