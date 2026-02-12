@@ -8,7 +8,7 @@ self.disable_namespace "<%= d %>"
 <% end %>
 
 # We want this file to apply the default extensions as they were defined during
-# generation, *not* the ones that are currently setup for the given project. 
+# generation, *not* the ones that are currently setup for the given project.
 #
 # So, override the list of default extensions by the ones that were used at
 # generation. Revert with pop_default_extensions_state at the end of the file
@@ -25,7 +25,7 @@ using_typekit "<%= tk.name %>"
 
 <% if project.cxx_standard %>
 # override the c++ standard with the final result at generation time
-cxx_standard = "<%= project.cxx_standard %>"
+cxx_standard "<%= project.cxx_standard %>"
 <% end %>
 
 Spec::TaskContext.pop_default_extensions_state
