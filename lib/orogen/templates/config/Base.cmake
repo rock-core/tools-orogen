@@ -1,5 +1,11 @@
 include(OrogenPkgCheckModules)
 
+option(
+    OROGEN_EXPLICIT_CXX_STANDARD
+    "If set, do not import -std options from used pkg-config libraries. The C++ standard must be specified with `cxx_standard` in the orogen file, possibly using `cxx_standard max_library_cxx_standard` to follow the dependencies' value"
+    OFF
+)
+
 ADD_CUSTOM_TARGET(regen
     <% ruby_bin   = RbConfig::CONFIG['RUBY_INSTALL_NAME'] %>
     <%= ruby_bin %> -S orogen <%= RTT_CPP.command_line_options.join(" ") %> <%= project.deffile %>
