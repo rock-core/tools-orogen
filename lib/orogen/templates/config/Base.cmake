@@ -3,7 +3,7 @@ include(OrogenPkgCheckModules)
 option(
     OROGEN_EXPLICIT_CXX_STANDARD
     "If set, do not import -std options from used pkg-config libraries. The C++ standard must be specified with `cxx_standard` in the orogen file, possibly using `cxx_standard max_library_cxx_standard` to follow the dependencies' value"
-    OFF
+    <%= project.cxx_standard ? "ON" : "OFF" %>
 )
 
 ADD_CUSTOM_TARGET(regen
