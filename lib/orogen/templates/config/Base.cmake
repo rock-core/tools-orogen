@@ -6,6 +6,12 @@ option(
     <%= project.cxx_standard ? "ON" : "OFF" %>
 )
 
+function(orogen_apply_task_library_options TARGET_NAME)
+    <% if project.cxx_standard %>
+    target_compile_features(${TARGET_NAME} PUBLIC <%= project.cxx_standard.sub(/^(c|gnu)\+\+/, "cxx_std_") %>)
+    <% end %>
+endfunction()
+
 ADD_CUSTOM_TARGET(regen
     <% ruby_bin   = RbConfig::CONFIG['RUBY_INSTALL_NAME'] %>
     <%= ruby_bin %> -S orogen <%= RTT_CPP.command_line_options.join(" ") %> <%= project.deffile %>

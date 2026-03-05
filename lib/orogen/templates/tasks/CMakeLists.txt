@@ -21,9 +21,7 @@ SET_TARGET_PROPERTIES(${<%= project.name.upcase %>_TASKLIB_NAME}
 SET_TARGET_PROPERTIES(${<%= project.name.upcase %>_TASKLIB_NAME}
     PROPERTIES INTERFACE_LINK_LIBRARIES "${<%= project.name.upcase %>_TASKLIB_INTERFACE_LIBRARIES}")
 
-<% if project.cxx_standard %>
-TARGET_COMPILE_FEATURES(${<%= project.name.upcase %>_TASKLIB_NAME} PUBLIC <%= project.cxx_standard.sub(/^(c|gnu)\+\+/, "cxx_std_") %>)
-<% end %>
+orogen_apply_task_library_options(${<%= project.name.upcase %>_TASKLIB_NAME})
 
 INSTALL(TARGETS ${<%= project.name.upcase %>_TASKLIB_NAME}
     RUNTIME DESTINATION bin
